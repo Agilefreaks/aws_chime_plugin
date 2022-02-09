@@ -18,6 +18,6 @@ void main() {
   });
 
   test('getPlatformVersion', () async {
-    expect(await AwsChimePlugin.platformVersion, '42');
+    expect(await AwsChimePlugin.version, '42');
   });
 }
