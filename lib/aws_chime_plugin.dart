@@ -48,4 +48,14 @@ class AwsChimePlugin {
   static Future<String?> audioVideoStop() async {
     return _methodChannel.invokeMethod('AudioVideoStop');
   }
+
+  /// Starts all remote video
+  static Future<String?> audioVideoStartRemoteVideo() async {
+    return _methodChannel.invokeMethod('AudioVideoStartRemoteVideo');
+  }
+
+  /// Stops all remote video
+  static Future<String?> audioVideoStopRemoteVideo() async {
+    return _methodChannel.invokeMethod('AudioVideoStopRemoteVideo');
+  }
 }
