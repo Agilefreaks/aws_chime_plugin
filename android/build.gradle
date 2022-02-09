@@ -41,7 +41,7 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
     }
 }
 
@@ -49,4 +49,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     implementation "com.google.code.gson:gson:2.8.6" // required by Chime
+
+    compileOnly fileTree(dir: 'amazon-chime-sdk', include: ['amazon-chime-sdk.aar'])
+    compileOnly fileTree(dir: 'amazon-chime-sdk', include: ['amazon-chime-sdk-media.aar'])
 }
