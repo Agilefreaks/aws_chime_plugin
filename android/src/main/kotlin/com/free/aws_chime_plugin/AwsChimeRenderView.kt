@@ -12,6 +12,7 @@ class AwsChimeRenderView internal constructor(context: Context?) : PlatformView,
     MethodChannel.MethodCallHandler {
 
     private val defaultVideoView: DefaultVideoRenderView = DefaultVideoRenderView(context!!)
+
     val videoRenderView: VideoRenderView get() = defaultVideoView
 
     override fun getView(): View = defaultVideoView

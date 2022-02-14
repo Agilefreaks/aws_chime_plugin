@@ -7,7 +7,19 @@ import io.flutter.plugin.platform.PlatformViewFactory
 
 class AwsChimeRenderViewFactory : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
     override fun create(context: Context?, viewId: Int, args: Any?): PlatformView {
-        TODO("Not yet implemented")
+        val view = AwsChimeRenderView(context)
+        viewIdToMapView[viewId] = view
+        return view
+
     }
 
+    companion object {
+        private val viewIdToMapView: MutableMap<Int, AwsChimeRenderView> = HashMap()
+
+        fun getViewById(id: Int): AwsChimeRenderView? = viewIdToMapView[id]
+
+        fun clearViewIds() {
+            viewIdToMapView.clear()
+        }
+    }
 }

@@ -25,7 +25,8 @@ class AwsChimePlugin {
       required String signalingUrl,
       required String turnControlUrl,
       required String meetingId,
-      required String mediaRegion}) async {
+      required String mediaRegion, 
+      required String externalUserId}) async {
     var params = {
       "MeetingId": meetingId,
       "ExternalMeetingId": externalMeetingId,
@@ -33,7 +34,8 @@ class AwsChimePlugin {
       "MediaPlacementAudioHostUrl": audioHostUrl,
       "MediaPlacementAudioFallbackUrl": audioFallbackUrl,
       "MediaPlacementSignalingUrl": signalingUrl,
-      "MediaPlacementTurnControlUrl": turnControlUrl
+      "MediaPlacementTurnControlUrl": turnControlUrl, 
+      "ExternalUserId": externalUserId
     };
 
     return _methodChannel.invokeMethod('CreateMeeting', params);
