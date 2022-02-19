@@ -5,17 +5,17 @@ import 'package:flutter/services.dart';
 import 'package:aws_chime_plugin/aws_chime_plugin.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(AwsChimeApp());
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+class AwsChimeApp extends StatefulWidget {
+  const AwsChimeApp({Key? key}) : super(key: key);
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<AwsChimeApp> createState() => _AwsChimeAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _AwsChimeAppState extends State<AwsChimeApp> {
   String _platformVersion = 'Unknown';
 
   @override
@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
     // We also handle the message potentially returning null.
     try {
       platformVersion =
-          await AwsChimePlugin.platformVersion ?? 'Unknown platform version';
+          await AwsChimePlugin.version ?? 'Unknown platform version';
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
