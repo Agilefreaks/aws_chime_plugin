@@ -1,5 +1,6 @@
 package com.free.aws_chime_plugin
 
+import ChimeActiveSpeakerObserver
 import android.content.Context
 import android.util.Log
 import androidx.annotation.NonNull
@@ -7,6 +8,7 @@ import com.amazonaws.services.chime.sdk.meetings.audiovideo.AudioVideoFacade
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.audio.activespeakerpolicy.DefaultActiveSpeakerPolicy
 import com.amazonaws.services.chime.sdk.meetings.session.*
 import com.amazonaws.services.chime.sdk.meetings.utils.logger.ConsoleLogger
+import com.free.aws_chime_plugin.observers.*
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
@@ -179,7 +181,7 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
 
         safeAudioVideoFacade.addActiveSpeakerObserver(
             DefaultActiveSpeakerPolicy(),
-            ChimeActiveSpeakerDetectedObserver(safeEventSink)
+            ChimeActiveSpeakerObserver(safeEventSink)
         )
         safeAudioVideoFacade.addAudioVideoObserver(ChimeAudioVideoObserver(safeEventSink))
         safeAudioVideoFacade.addDeviceChangeObserver(ChimeDeviceChangeObserver(safeEventSink))
@@ -190,6 +192,68 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         result.success(null)
     }
 
+
+    private fun handleAudioVideoStart(result: Result) {
+        val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
+        if (safeAudioVideoFacade == null) {
+            result.error(
+                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                null
+            )
+            return
+        }
+
+        safeAudioVideoFacade.start()
+        result.success(null)
+    }
+
+
+    private fun handleAudioVideoStop(result: Result) {
+        val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
+        if (safeAudioVideoFacade == null) {
+            result.error(
+                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                null
+            )
+            return
+        }
+
+        safeAudioVideoFacade.stop()
+        result.success(null)
+    }
+
+    private fun handleAudioVideoStartRemoteVideo(result: Result) {
+        val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
+        if (safeAudioVideoFacade == null) {
+            result.error(
+                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                null
+            )
+            return
+        }
+
+        safeAudioVideoFacade.startRemoteVideo()
+        result.success(null)
+    }
+
+    private fun handleAudioVideoStopRemoteVideo(result: Result) {
+        val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
+        if (safeAudioVideoFacade == null) {
+            result.error(
+                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                null
+            )
+            return
+        }
+
+        safeAudioVideoFacade.stopRemoteVideo()
+        result.success(null)
+    }
+    
     companion object {
         private const val MEETING_ID = "MeetingId"
         private const val EXTERNAL_MEETING_ID = "ExternalMeetingId"
@@ -201,8 +265,11 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         private const val EXTERNAL_USER_ID = "ExternalUserId"
         private const val TAG = "AwsChimePlugin"
         private const val UNEXPECTED_NULL_PARAMETER_ERROR_CODE = "4"
+        private const val NO_AUDIO_VIDEO_FACADE_ERROR_CODE = "2"
+        private const val NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE = "No AudioVideoFacade created."
         private const val UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE = "Unexpected null parameter: "
         private const val UNEXPECTED_ERROR_CODE = "99"
         private const val UNEXPECTED_ERROR_MESSAGE = "Unexpected error."
+
     }
 }
