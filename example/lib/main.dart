@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'data/attendee.dart';
 import 'data/attendees.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
 
 void main() {
   runApp(const AwsChimeApp());
@@ -22,7 +24,6 @@ class _AwsChimeAppState extends State<AwsChimeApp> {
   String _platformVersion = 'Unknown';
   String _createMeetingSessionResult = 'CreateMeetingSession';
   String _audioVideoStartResult = 'AudioVideo';
-  String _audioVideoStartLocalVideoResult = 'AudioVideoLocalVideo';
   String _audioVideoStartRemoteVideoResult = 'AudioVideoRemoteVideo';
 
   Attendees _attendees = Attendees();
@@ -58,8 +59,56 @@ class _AwsChimeAppState extends State<AwsChimeApp> {
     var chimeViewColumn = Column(children: chimeViewChildren);
 
     Widget content;
+    final TextEditingController _meetingIdController = TextEditingController();
+    final TextEditingController _attendeNameController =
+        TextEditingController();
 
     content = Column(children: [
+      const Text('Meeting id:'),
+      Container(
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.black, width: 3.0),
+            borderRadius: const BorderRadius.all(Radius.circular(10.0))),
+        child: EditableText(
+          cursorColor: Colors.black,
+          textDirection: TextDirection.ltr,
+          focusNode: FocusNode(),
+          style: const TextStyle(color: Colors.black),
+          controller: _meetingIdController,
+          backgroundCursorColor: Colors.black,
+        ),
+      ),
+      const Text('Attende name:'),
+      Container(
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.black, width: 3.0),
+            borderRadius: const BorderRadius.all(Radius.circular(10.0))),
+        child: EditableText(
+          cursorColor: Colors.black,
+          textDirection: TextDirection.ltr,
+          focusNode: FocusNode(),
+          style: const TextStyle(color: Colors.black),
+          controller: _attendeNameController,
+          backgroundCursorColor: Colors.black,
+        ),
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          const Text('Create meeting:'),
+          ElevatedButton(
+            child: const Text('Start'),
+            onPressed: () => _createMeeting(
+                _meetingIdController.text, _attendeNameController.text),
+          )
+        ],
+      ),
       Text(_createMeetingSessionResult),
       const SizedBox(height: 8),
       Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
@@ -88,6 +137,7 @@ class _AwsChimeAppState extends State<AwsChimeApp> {
     return MaterialApp(
         home: Scaffold(
             appBar: AppBar(title: const Text('AwsChimePlugin')),
+            resizeToAvoidBottomInset: false,
             body: Column(children: [
               const SizedBox(height: 8),
               Text(_platformVersion),
@@ -235,6 +285,29 @@ class _AwsChimeAppState extends State<AwsChimeApp> {
         mediaRegion: 'us-east-1',
         externalUserId: externalUserId,
         joinToken: joinToken);
+  }
+
+  Future<String?> _createMeeting(String meetingId, String attendeeName) async {
+    String awsServerUrl =
+        "https://wbe7o32i1j.execute-api.us-east-1.amazonaws.com/Prod";
+
+    var url = Uri.parse(
+        '$awsServerUrl/join?title=$meetingId&name=$attendeeName&region=us-east-1');
+
+    var client = http.Client();
+
+    var response = await http.post(url, encoding: Encoding.getByName("utf-8"));
+
+    if (response.statusCode == 200) {
+      var jsonResponse =
+          convert.jsonDecode(response.body) as Map<String, dynamic>;
+
+      print('Success!');
+    } else {
+      print('Request failed with status: ${response.statusCode}.');
+    }
+
+    return "";
   }
 
   Future<void> _audioVideoStart() async {
