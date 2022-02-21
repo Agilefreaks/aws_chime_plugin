@@ -35,16 +35,65 @@ class _AwsChimeAppState extends State<AwsChimeApp> {
 
   @override
   Widget build(BuildContext context) {
+    var chimeViewChildren = List<Widget>.empty(growable: true);
+
+    if (_attendees.length == 0) {
+      chimeViewChildren
+          .add(const Expanded(child: Center(child: Text('No attendees yet.'))));
+    } else {
+      for (int attendeeIndex = 0;
+          attendeeIndex < _attendees.length;
+          attendeeIndex++) {
+        Attendee attendee = _attendees[attendeeIndex];
+        if (attendee.videoView != null) {
+          chimeViewChildren.add(Expanded(
+              child: Center(
+                  child: AspectRatio(
+                      aspectRatio: attendee.aspectRatio,
+                      child: attendee.videoView))));
+        }
+      }
+    }
+
+    var chimeViewColumn = Column(children: chimeViewChildren);
+
+    Widget content;
+
+    content = Column(children: [
+      Text(_createMeetingSessionResult),
+      const SizedBox(height: 8),
+      Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+        const Text('Audio/Video:'),
+        ElevatedButton(
+            child: const Text('Start'), onPressed: () => _audioVideoStart()),
+        ElevatedButton(
+            child: const Text('Stop'), onPressed: () => _audioVideoStop())
+      ]),
+      Text(_audioVideoStartResult),
+      const SizedBox(height: 8),
+      Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+        const Text('Remote Video:'),
+        ElevatedButton(
+            child: const Text('Start'),
+            onPressed: () => _audioVideoStartRemoteVideo()),
+        ElevatedButton(
+            child: const Text('Stop'),
+            onPressed: () => _audioVideoStopRemoteVideo())
+      ]),
+      Text(_audioVideoStartRemoteVideoResult),
+      const SizedBox(height: 8),
+      Expanded(child: chimeViewColumn)
+    ]);
+
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
-        ),
-      ),
-    );
+        home: Scaffold(
+            appBar: AppBar(title: const Text('AwsChimePlugin')),
+            body: Column(children: [
+              const SizedBox(height: 8),
+              Text(_platformVersion),
+              const SizedBox(height: 8),
+              Expanded(child: content)
+            ])));
   }
 
   void _startChime() async {
@@ -186,5 +235,77 @@ class _AwsChimeAppState extends State<AwsChimeApp> {
         mediaRegion: 'us-east-1',
         externalUserId: externalUserId,
         joinToken: joinToken);
+  }
+
+  Future<void> _audioVideoStart() async {
+    String result;
+
+    try {
+      result = (await AwsChimePlugin.audioVideoStart())!;
+    } on PlatformException catch (e) {
+      result = 'AudioVideoStart failed: PlatformException: $e';
+    } catch (e) {
+      result = 'AudioVideoStart failed: Error: $e';
+    }
+
+    if (mounted) {
+      setState(() {
+        _audioVideoStartResult = result;
+      });
+    }
+  }
+
+  Future<void> _audioVideoStop() async {
+    String result;
+
+    try {
+      result = (await AwsChimePlugin.audioVideoStop())!;
+    } on PlatformException catch (e) {
+      result = 'AudioVideoStop failed: PlatformException: $e';
+    } catch (e) {
+      result = 'AudioVideoStop failed: Error: $e';
+    }
+
+    if (mounted) {
+      setState(() {
+        _audioVideoStartResult = result;
+      });
+    }
+  }
+
+  Future<void> _audioVideoStartRemoteVideo() async {
+    String result;
+
+    try {
+      result = (await AwsChimePlugin.audioVideoStartRemoteVideo())!;
+    } on PlatformException catch (e) {
+      result = 'AudioVideoStartRemoteVideo failed: PlatformException: $e';
+    } catch (e) {
+      result = 'AudioVideoStartRemoteVideo failed: Error: $e';
+    }
+
+    if (mounted) {
+      setState(() {
+        _audioVideoStartRemoteVideoResult = result;
+      });
+    }
+  }
+
+  Future<void> _audioVideoStopRemoteVideo() async {
+    String result;
+
+    try {
+      result = (await AwsChimePlugin.audioVideoStopRemoteVideo())!;
+    } on PlatformException catch (e) {
+      result = 'AudioVideoStopRemoteVideo failed: PlatformException: $e';
+    } catch (e) {
+      result = 'AudioVideoStopRemoteVideo failed: Error: $e';
+    }
+
+    if (mounted) {
+      setState(() {
+        _audioVideoStartRemoteVideoResult = result;
+      });
+    }
   }
 }
