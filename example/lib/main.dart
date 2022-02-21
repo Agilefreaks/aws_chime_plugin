@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:aws_chime_plugin/aws_chime.dart';
-import 'package:aws_chime_plugin/aws_chime_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';

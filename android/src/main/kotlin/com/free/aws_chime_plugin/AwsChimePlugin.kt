@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.annotation.NonNull
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.AudioVideoFacade
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.audio.activespeakerpolicy.DefaultActiveSpeakerPolicy
+import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.VideoRenderView
 import com.amazonaws.services.chime.sdk.meetings.session.*
 import com.amazonaws.services.chime.sdk.meetings.utils.logger.ConsoleLogger
 import com.free.aws_chime_plugin.observers.*
@@ -63,6 +64,8 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
             "AudioVideoStop" -> handleAudioVideoStop(result)
             "AudioVideoStartRemoteVideo" -> handleAudioVideoStartRemoteVideo(result)
             "AudioVideoStopRemoteVideo" -> handleAudioVideoStopRemoteVideo(result)
+            "BindVideoView" -> handleBindVideoView(call, result)
+            "UnbindVideoView" -> handleUnbindVideoView(call, result)
             else -> result.notImplemented()
         }
     }
@@ -274,6 +277,73 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         result.success(null)
     }
 
+    private fun handleBindVideoView(call: MethodCall, result: Result) {
+        val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
+        if (safeAudioVideoFacade == null) {
+            result.error(
+                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                null
+            )
+            return
+        }
+
+        val viewId = call.argument<Int>(VIEW_ID)
+        if (viewId == null) {
+            result.error(
+                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + VIEW_ID,
+                null
+            )
+            return
+        }
+
+        val tileId = call.argument<Int>(TILE_ID)
+        if (tileId == null) {
+            result.error(
+                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + TILE_ID,
+                null
+            )
+            return
+        }
+
+        val view = AwsChimeRenderViewFactory.getViewById(viewId)
+        if (view == null) {
+            result.error(VIEW_NOT_FOUND_ERROR_CODE, VIEW_NOT_FOUND_ERROR_MESSAGE + viewId, null)
+            return
+        }
+
+        val videoRenderView: VideoRenderView = view.videoRenderView
+
+        safeAudioVideoFacade.bindVideoView(videoRenderView, tileId)
+        result.success(null)
+    }
+
+    private fun handleUnbindVideoView(call: MethodCall, result: Result) {
+        val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
+        if (safeAudioVideoFacade == null) {
+            result.error(
+                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                null
+            )
+            return
+        }
+
+        val tileId = call.argument<Int>(TILE_ID)
+        if (tileId == null) {
+            result.error(
+                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + TILE_ID,
+                null
+            )
+            return
+        }
+
+        result.success(null)
+    }
+
     companion object {
         private const val MEETING_ID = "MeetingId"
         private const val EXTERNAL_MEETING_ID = "ExternalMeetingId"
@@ -286,12 +356,15 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         private const val JoinToken = "JoinToken"
         private const val ATTENDEE_ID = "AttendeeId"
         private const val TAG = "AwsChimePlugin"
+        private const val TILE_ID = "TileId"
+        private const val VIEW_ID = "TileId"
         private const val UNEXPECTED_NULL_PARAMETER_ERROR_CODE = "4"
         private const val NO_AUDIO_VIDEO_FACADE_ERROR_CODE = "2"
+        private const val VIEW_NOT_FOUND_ERROR_CODE = "3"
+        private const val VIEW_NOT_FOUND_ERROR_MESSAGE = "No View found with ViewId="
         private const val NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE = "No AudioVideoFacade created."
         private const val UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE = "Unexpected null parameter: "
         private const val UNEXPECTED_ERROR_CODE = "99"
         private const val UNEXPECTED_ERROR_MESSAGE = "Unexpected error."
-
     }
 }

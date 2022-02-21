@@ -64,7 +64,6 @@ class AwsChimePlugin {
   }
 
   /// Binds a view to a video tile.
-  //  @Todo: Check if this methods are in android project!
   static Future<String?> bindVideoView(int viewId, int tileId) async {
     var params = {"ViewId": viewId, "TileId": tileId};
     return _methodChannel.invokeMethod('BindVideoView', params);
