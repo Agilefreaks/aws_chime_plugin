@@ -20,22 +20,24 @@ class AwsChimePlugin {
   /// Create a metting session
   static Future<String?> createMeeting(
       {required String externalMeetingId,
-      required String audioFallbackUrl,
-      required String audioHostUrl,
-      required String signalingUrl,
-      required String turnControlUrl,
+      required String mediaPlacementAudioFallbackUrl,
+      required String mediaPlacementAudioHostUrl,
+      required String mediaPlacementSignalingUrl,
+      required String mediaPlacementTurnControlUrl,
       required String meetingId,
-      required String mediaRegion, 
-      required String externalUserId}) async {
+      required String mediaRegion,
+      required String externalUserId,
+      required String joinToken}) async {
     var params = {
       "MeetingId": meetingId,
       "ExternalMeetingId": externalMeetingId,
       "MediaRegion": mediaRegion,
-      "MediaPlacementAudioHostUrl": audioHostUrl,
-      "MediaPlacementAudioFallbackUrl": audioFallbackUrl,
-      "MediaPlacementSignalingUrl": signalingUrl,
-      "MediaPlacementTurnControlUrl": turnControlUrl, 
-      "ExternalUserId": externalUserId
+      "MediaPlacementAudioHostUrl": mediaPlacementAudioHostUrl,
+      "MediaPlacementAudioFallbackUrl": mediaPlacementAudioFallbackUrl,
+      "MediaPlacementSignalingUrl": mediaPlacementSignalingUrl,
+      "MediaPlacementTurnControlUrl": mediaPlacementTurnControlUrl,
+      "ExternalUserId": externalUserId,
+      "JoinToken": joinToken
     };
 
     return _methodChannel.invokeMethod('CreateMeeting', params);
@@ -59,5 +61,18 @@ class AwsChimePlugin {
   /// Stops all remote video
   static Future<String?> audioVideoStopRemoteVideo() async {
     return _methodChannel.invokeMethod('AudioVideoStopRemoteVideo');
+  }
+
+  /// Binds a view to a video tile.
+  //  @Todo: Check if this methods are in android project!
+  static Future<String?> bindVideoView(int viewId, int tileId) async {
+    var params = {"ViewId": viewId, "TileId": tileId};
+    return _methodChannel.invokeMethod('BindVideoView', params);
+  }
+
+  /// Unbinds a video tile.
+  static Future<String?> unbindVideoView(int tileId) async {
+    var params = {"TileId": tileId};
+    return _methodChannel.invokeMethod('UnbindVideoView', params);
   }
 }

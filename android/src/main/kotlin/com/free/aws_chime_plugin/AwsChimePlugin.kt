@@ -84,6 +84,16 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
             return
         }
 
+        val attendeeId = call.argument<String>(ATTENDEE_ID)
+        if (attendeeId == null) {
+            result.error(
+                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + ATTENDEE_ID,
+                null
+            )
+            return
+        }
+
         val externalMeetingId = call.argument<String>(EXTERNAL_MEETING_ID)
         if (externalMeetingId == null) {
             result.error(
@@ -155,6 +165,16 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
             )
         }
 
+        val joinToken = call.argument<String>(JoinToken)
+        if (joinToken == null) {
+            result.error(
+                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + JoinToken,
+                null
+            )
+            return
+        }
+
         val mediaPlacement = MediaPlacement(
             mediaPlacementAudioFallbackUrl,
             mediaPlacementAudioHostUrl,
@@ -163,7 +183,7 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         )
         val meeting = Meeting(externalMeetingId, mediaPlacement, mediaRegion, meetingId)
         val meetingResponse = CreateMeetingResponse(meeting)
-        val attendee = Attendee("attendeeId", externalUserId!!, "joinToken")
+        val attendee = Attendee(attendeeId, externalUserId!!, joinToken)
         val attendeeResponse = CreateAttendeeResponse(attendee)
         val configuration =
             MeetingSessionConfiguration(meetingResponse, attendeeResponse) { s: String? -> s!! }
@@ -253,7 +273,7 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         safeAudioVideoFacade.stopRemoteVideo()
         result.success(null)
     }
-    
+
     companion object {
         private const val MEETING_ID = "MeetingId"
         private const val EXTERNAL_MEETING_ID = "ExternalMeetingId"
@@ -263,6 +283,8 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         private const val MEDIA_PLACEMENT_SIGNALING_URL = "MediaPlacementSignalingUrl"
         private const val MEDIA_PLACEMENT_TURN_CONTROL_URL = "MediaPlacementTurnControlUrl"
         private const val EXTERNAL_USER_ID = "ExternalUserId"
+        private const val JoinToken = "JoinToken"
+        private const val ATTENDEE_ID = "AttendeeId"
         private const val TAG = "AwsChimePlugin"
         private const val UNEXPECTED_NULL_PARAMETER_ERROR_CODE = "4"
         private const val NO_AUDIO_VIDEO_FACADE_ERROR_CODE = "2"
