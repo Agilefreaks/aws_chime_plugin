@@ -104,7 +104,7 @@ class _AwsChimeAppState extends State<AwsChimeApp> {
           const Text('Create meeting:'),
           ElevatedButton(
             child: const Text('Start'),
-            onPressed: () => _createMeeting(
+            onPressed: () => _joinMeetingAws(
                 _meetingIdController.text, _attendeNameController.text),
           )
         ],
@@ -287,20 +287,19 @@ class _AwsChimeAppState extends State<AwsChimeApp> {
         joinToken: joinToken);
   }
 
-  Future<String?> _createMeeting(String meetingId, String attendeeName) async {
+  Future<String?> _joinMeetingAws(String meetingId, String attendeeName) async {
     String awsServerUrl =
         "https://wbe7o32i1j.execute-api.us-east-1.amazonaws.com/Prod";
 
     var url = Uri.parse(
         '$awsServerUrl/join?title=$meetingId&name=$attendeeName&region=us-east-1');
 
-    var client = http.Client();
-
     var response = await http.post(url, encoding: Encoding.getByName("utf-8"));
 
     if (response.statusCode == 200) {
-      var jsonResponse =
-          convert.jsonDecode(response.body) as Map<String, dynamic>;
+      var awsInfo = convert.jsonDecode(response.body) as Map<String, dynamic>;
+
+      // here need to createMeeting() with awsInfo
 
       print('Success!');
     } else {
