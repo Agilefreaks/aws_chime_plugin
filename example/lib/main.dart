@@ -7,7 +7,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'data/attendee.dart';
 import 'data/attendees.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
+
+import 'data/aws_info.dart';
 
 void main() {
   runApp(const AwsChimeApp());
@@ -21,10 +22,10 @@ class AwsChimeApp extends StatefulWidget {
 }
 
 class _AwsChimeAppState extends State<AwsChimeApp> {
-  String _platformVersion = 'Unknown';
-  String _createMeetingSessionResult = 'CreateMeetingSession';
-  String _audioVideoStartResult = 'AudioVideo';
-  String _audioVideoStartRemoteVideoResult = 'AudioVideoRemoteVideo';
+  String _createMeetingSessionResult = 'CreateMeetingSession: Unknown';
+  String _audioVideoStartResult = 'AudioVideo: Unknown';
+  String _audioVideoStartLocalVideoResult = 'AudioVideoLocalVideo: Unknown';
+  String _audioVideoStartRemoteVideoResult = 'AudioVideoRemoteVideo: Unknown';
 
   Attendees _attendees = Attendees();
 
@@ -58,12 +59,12 @@ class _AwsChimeAppState extends State<AwsChimeApp> {
 
     var chimeViewColumn = Column(children: chimeViewChildren);
 
-    Widget content;
+    Widget inputMeetingIdAndAttendeeName;
     final TextEditingController _meetingIdController = TextEditingController();
     final TextEditingController _attendeNameController =
         TextEditingController();
 
-    content = Column(children: [
+    inputMeetingIdAndAttendeeName = Column(children: [
       const Text('Meeting id:'),
       Container(
         margin: const EdgeInsets.all(10),
@@ -109,29 +110,6 @@ class _AwsChimeAppState extends State<AwsChimeApp> {
           )
         ],
       ),
-      Text(_createMeetingSessionResult),
-      const SizedBox(height: 8),
-      Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-        const Text('Audio/Video:'),
-        ElevatedButton(
-            child: const Text('Start'), onPressed: () => _audioVideoStart()),
-        ElevatedButton(
-            child: const Text('Stop'), onPressed: () => _audioVideoStop())
-      ]),
-      Text(_audioVideoStartResult),
-      const SizedBox(height: 8),
-      Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-        const Text('Remote Video:'),
-        ElevatedButton(
-            child: const Text('Start'),
-            onPressed: () => _audioVideoStartRemoteVideo()),
-        ElevatedButton(
-            child: const Text('Stop'),
-            onPressed: () => _audioVideoStopRemoteVideo())
-      ]),
-      Text(_audioVideoStartRemoteVideoResult),
-      const SizedBox(height: 8),
-      Expanded(child: chimeViewColumn)
     ]);
 
     return MaterialApp(
@@ -140,21 +118,55 @@ class _AwsChimeAppState extends State<AwsChimeApp> {
             resizeToAvoidBottomInset: false,
             body: Column(children: [
               const SizedBox(height: 8),
-              Text(_platformVersion),
+              Expanded(child: inputMeetingIdAndAttendeeName),
+              Text(_createMeetingSessionResult),
               const SizedBox(height: 8),
-              Expanded(child: content)
+              Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                const Text('Audio/Video:'),
+                ElevatedButton(
+                    child: const Text('Start'),
+                    onPressed: () => _audioVideoStart()),
+                ElevatedButton(
+                    child: const Text('Stop'),
+                    onPressed: () => _audioVideoStop())
+              ]),
+              Text(_audioVideoStartResult),
+              const SizedBox(height: 8),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                const Text('Local Video:'),
+                ElevatedButton(
+                    child: const Text('Start'),
+                    onPressed: () => _audioVideoStartLocalVideo()),
+                ElevatedButton(
+                    child: const Text('Stop'),
+                    onPressed: () => _audioVideoStopLocalVideo())
+              ]),
+              Text(_audioVideoStartLocalVideoResult),
+              const SizedBox(height: 8),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                const Text('Remote Video:'),
+                ElevatedButton(
+                    child: const Text('Start'),
+                    onPressed: () => _audioVideoStartRemoteVideo()),
+                ElevatedButton(
+                    child: const Text('Stop'),
+                    onPressed: () => _audioVideoStopRemoteVideo())
+              ]),
+              Text(_audioVideoStartRemoteVideoResult),
+              const SizedBox(height: 8),
+              Expanded(child: chimeViewColumn)
             ])));
   }
 
   void _startChime() async {
     if (Platform.isAndroid) {
       _addListener();
-      await _createMeetingSession();
+      // await _createMeetingSession();
     } else if (Platform.isIOS) {
       // Nothing for now
     } else {
       _addListener();
-      await _createMeetingSession();
+      // await _createMeetingSession();
     }
   }
 
@@ -178,10 +190,207 @@ class _AwsChimeAppState extends State<AwsChimeApp> {
           break;
       }
     }, onDone: () {
-      print('Chime.eventChannel.receiveBroadcastStream().listen().onDone()');
+      print('Chime.eventChannel.receiveBroadcastStream().listen()/onDone()');
     }, onError: (e) {
-      print('Chime.eventChannel.receiveBroadcastStream().listen().onError()');
+      print('Chime.eventChannel.receiveBroadcastStream().listen()/onError()');
     });
+  }
+
+  late AwsInfo awsInfo;
+
+  Future<String?> _joinMeetingAws(String meetingId, String attendeeName) async {
+    String awsServerUrl =
+        "https://wbe7o32i1j.execute-api.us-east-1.amazonaws.com/Prod";
+
+    var url = Uri.parse(
+        '$awsServerUrl/join?title=$meetingId&name=$attendeeName&region=us-east-1');
+
+    var response = await http.post(url, encoding: Encoding.getByName("utf-8"));
+
+    if (response.statusCode == 200) {
+      awsInfo = awsInfoFromJson(response.body);
+      await _createMeetingSession();
+    } else {
+      print('Request failed with status: ${response.statusCode}.');
+    }
+
+    return "";
+  }
+
+  Future<String?> createMeeting(
+      {required String meetingId,
+      required String externalMeetingId,
+      required String mediaPlacementAudioHostUrl,
+      required String attendeeId,
+      required String externalUserId,
+      required String joinToken,
+      required String mediaPlacementSignalingUrl,
+      required String mediaPlacementAudioFallbackUrl,
+      required String mediaPlacementTurnControlUrl,
+      required String mediaRegion}) {
+    return AwsChimePlugin.createMeeting(
+        meetingId: meetingId,
+        externalMeetingId: externalMeetingId,
+        mediaRegion: mediaRegion,
+        mediaPlacementAudioHostUrl: mediaPlacementAudioHostUrl,
+        mediaPlacementAudioFallbackUrl: mediaPlacementAudioFallbackUrl,
+        mediaPlacementSignalingUrl: mediaPlacementSignalingUrl,
+        mediaPlacementTurnControlUrl: mediaPlacementTurnControlUrl,
+        attendeeId: attendeeId,
+        externalUserId: externalUserId,
+        joinToken: joinToken);
+  }
+
+  Future<void> _createMeetingSession() async {
+    if (await Permission.microphone.request().isGranted == false) {
+      _createMeetingSessionResult = 'Need microphone permission.';
+      return;
+    }
+
+    if (await Permission.camera.request().isGranted == false) {
+      _createMeetingSessionResult = 'Need camera permission.';
+      return;
+    }
+
+    String meetingSessionState;
+
+    try {
+      meetingSessionState = (await createMeeting(
+          meetingId: awsInfo.joinInfo.meeting.meeting.meetingId,
+          externalMeetingId: awsInfo.joinInfo.meeting.meeting.externalMeetingId,
+          mediaPlacementAudioHostUrl:
+              awsInfo.joinInfo.meeting.meeting.mediaPlacement.audioHostUrl,
+          attendeeId: awsInfo.joinInfo.attendee.attendee.attendeeId,
+          externalUserId: awsInfo.joinInfo.attendee.attendee.externalUserId,
+          joinToken: awsInfo.joinInfo.attendee.attendee.joinToken,
+          mediaPlacementAudioFallbackUrl:
+              awsInfo.joinInfo.meeting.meeting.mediaPlacement.audioFallbackUrl,
+          mediaPlacementSignalingUrl:
+              awsInfo.joinInfo.meeting.meeting.mediaPlacement.signalingUrl,
+          mediaPlacementTurnControlUrl:
+              awsInfo.joinInfo.meeting.meeting.mediaPlacement.turnControlUrl,
+          mediaRegion: awsInfo.joinInfo.meeting.meeting.mediaRegion))!;
+    } on PlatformException catch (e) {
+      meetingSessionState =
+          'Failed to create MeetingSession. PlatformException: $e';
+    } catch (e) {
+      meetingSessionState = 'Failed to create MeetingSession. Error: $e';
+    }
+
+    if (mounted) {
+      setState(() {
+        _createMeetingSessionResult = meetingSessionState;
+      });
+    }
+  }
+
+  Future<void> _audioVideoStart() async {
+    String result;
+
+    try {
+      // await _joinMeetingAws("asda", "alesf");
+      result = (await AwsChimePlugin.audioVideoStart())!;
+    } on PlatformException catch (e) {
+      result = 'AudioVideoStart failed: PlatformException: $e';
+    } catch (e) {
+      result = 'AudioVideoStart failed: Error: $e';
+    }
+
+    if (mounted) {
+      setState(() {
+        _audioVideoStartResult = result;
+      });
+    }
+  }
+
+  Future<void> _audioVideoStop() async {
+    String result;
+
+    try {
+      result = (await AwsChimePlugin.audioVideoStop())!;
+    } on PlatformException catch (e) {
+      result = 'AudioVideoStop failed: PlatformException: $e';
+    } catch (e) {
+      result = 'AudioVideoStop failed: Error: $e';
+    }
+
+    if (mounted) {
+      setState(() {
+        _audioVideoStartResult = result;
+      });
+    }
+  }
+
+  Future<void> _audioVideoStartLocalVideo() async {
+    String result;
+
+    try {
+      result = (await AwsChimePlugin.audioVideoStartLocalVideo())!;
+    } on PlatformException catch (e) {
+      result = 'AudioVideoStartLocalVideo failed: PlatformException: $e';
+    } catch (e) {
+      result = 'AudioVideoStartLocalVideo failed: Error: $e';
+    }
+
+    if (mounted) {
+      setState(() {
+        _audioVideoStartLocalVideoResult = result;
+      });
+    }
+  }
+
+  Future<void> _audioVideoStopLocalVideo() async {
+    String result;
+
+    try {
+      result = (await AwsChimePlugin.audioVideoStopLocalVideo())!;
+    } on PlatformException catch (e) {
+      result = 'AudioVideoStopLocalVideo failed: PlatformException: $e';
+    } catch (e) {
+      result = 'AudioVideoStopLocalVideo failed: Error: $e';
+    }
+
+    if (mounted) {
+      setState(() {
+        _audioVideoStartLocalVideoResult = result;
+      });
+    }
+  }
+
+  Future<void> _audioVideoStartRemoteVideo() async {
+    String result;
+
+    try {
+      result = (await AwsChimePlugin.audioVideoStartRemoteVideo())!;
+    } on PlatformException catch (e) {
+      result = 'AudioVideoStartRemoteVideo failed: PlatformException: $e';
+    } catch (e) {
+      result = 'AudioVideoStartRemoteVideo failed: Error: $e';
+    }
+
+    if (mounted) {
+      setState(() {
+        _audioVideoStartRemoteVideoResult = result;
+      });
+    }
+  }
+
+  Future<void> _audioVideoStopRemoteVideo() async {
+    String result;
+
+    try {
+      result = (await AwsChimePlugin.audioVideoStopRemoteVideo())!;
+    } on PlatformException catch (e) {
+      result = 'AudioVideoStopRemoteVideo failed: PlatformException: $e';
+    } catch (e) {
+      result = 'AudioVideoStopRemoteVideo failed: Error: $e';
+    }
+
+    if (mounted) {
+      setState(() {
+        _audioVideoStartRemoteVideoResult = result;
+      });
+    }
   }
 
   void _handleOnVideoTileAdded(dynamic arguments) async {
@@ -239,145 +448,5 @@ class _AwsChimeAppState extends State<AwsChimeApp> {
     setState(() {
       // refresh
     });
-  }
-
-  Future<void> _createMeetingSession() async {
-    if (await Permission.microphone.request().isGranted == false) {
-      _createMeetingSessionResult = 'Need microphone permission.';
-      return;
-    }
-
-    if (await Permission.camera.request().isGranted == false) {
-      _createMeetingSessionResult = 'Need camera permission.';
-      return;
-    }
-
-    String meetingSessionState;
-
-    try {
-      meetingSessionState = (await createMeeting("", "", "", "", ""))!;
-    } on PlatformException catch (e) {
-      meetingSessionState =
-          'Failed to create MeetingSession. PlatformException: $e';
-    } catch (e) {
-      meetingSessionState = 'Failed to create MeetingSession. Error: $e';
-    }
-
-    if (mounted) {
-      setState(() {
-        _createMeetingSessionResult = meetingSessionState;
-      });
-    }
-  }
-
-  Future<String?> createMeeting(String meetingId, String externalMeetingId,
-      String audioHostUrl, String externalUserId, String joinToken) {
-    return AwsChimePlugin.createMeeting(
-        externalMeetingId: externalMeetingId,
-        mediaPlacementAudioFallbackUrl:
-            'wss://haxrp.m2.ue1.app.chime.aws:443/calls/$meetingId',
-        mediaPlacementAudioHostUrl: audioHostUrl,
-        mediaPlacementSignalingUrl:
-            'wss://signal.m2.ue1.app.chime.aws/control/$meetingId',
-        mediaPlacementTurnControlUrl:
-            'https://2713.cell.us-east-1.meetings.chime.aws/v2/turn_sessions',
-        meetingId: meetingId,
-        mediaRegion: 'us-east-1',
-        externalUserId: externalUserId,
-        joinToken: joinToken);
-  }
-
-  Future<String?> _joinMeetingAws(String meetingId, String attendeeName) async {
-    String awsServerUrl =
-        "https://wbe7o32i1j.execute-api.us-east-1.amazonaws.com/Prod";
-
-    var url = Uri.parse(
-        '$awsServerUrl/join?title=$meetingId&name=$attendeeName&region=us-east-1');
-
-    var response = await http.post(url, encoding: Encoding.getByName("utf-8"));
-
-    if (response.statusCode == 200) {
-      var awsInfo = convert.jsonDecode(response.body) as Map<String, dynamic>;
-
-      // here need to createMeeting() with awsInfo
-
-      print('Success!');
-    } else {
-      print('Request failed with status: ${response.statusCode}.');
-    }
-
-    return "";
-  }
-
-  Future<void> _audioVideoStart() async {
-    String result;
-
-    try {
-      result = (await AwsChimePlugin.audioVideoStart())!;
-    } on PlatformException catch (e) {
-      result = 'AudioVideoStart failed: PlatformException: $e';
-    } catch (e) {
-      result = 'AudioVideoStart failed: Error: $e';
-    }
-
-    if (mounted) {
-      setState(() {
-        _audioVideoStartResult = result;
-      });
-    }
-  }
-
-  Future<void> _audioVideoStop() async {
-    String result;
-
-    try {
-      result = (await AwsChimePlugin.audioVideoStop())!;
-    } on PlatformException catch (e) {
-      result = 'AudioVideoStop failed: PlatformException: $e';
-    } catch (e) {
-      result = 'AudioVideoStop failed: Error: $e';
-    }
-
-    if (mounted) {
-      setState(() {
-        _audioVideoStartResult = result;
-      });
-    }
-  }
-
-  Future<void> _audioVideoStartRemoteVideo() async {
-    String result;
-
-    try {
-      result = (await AwsChimePlugin.audioVideoStartRemoteVideo())!;
-    } on PlatformException catch (e) {
-      result = 'AudioVideoStartRemoteVideo failed: PlatformException: $e';
-    } catch (e) {
-      result = 'AudioVideoStartRemoteVideo failed: Error: $e';
-    }
-
-    if (mounted) {
-      setState(() {
-        _audioVideoStartRemoteVideoResult = result;
-      });
-    }
-  }
-
-  Future<void> _audioVideoStopRemoteVideo() async {
-    String result;
-
-    try {
-      result = (await AwsChimePlugin.audioVideoStopRemoteVideo())!;
-    } on PlatformException catch (e) {
-      result = 'AudioVideoStopRemoteVideo failed: PlatformException: $e';
-    } catch (e) {
-      result = 'AudioVideoStopRemoteVideo failed: Error: $e';
-    }
-
-    if (mounted) {
-      setState(() {
-        _audioVideoStartRemoteVideoResult = result;
-      });
-    }
   }
 }

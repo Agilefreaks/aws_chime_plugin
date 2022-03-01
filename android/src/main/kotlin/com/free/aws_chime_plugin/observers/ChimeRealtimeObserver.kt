@@ -49,7 +49,7 @@ class ChimeRealtimeObserver(private val _eventSink: EventChannel.EventSink) : Re
         val jsonObject = JSONObject()
         val eventArguments = JSONObject()
         eventArguments.put("AttendeeInfos", convertAttendeeInfoToJson(attendeeInfo))
-        jsonObject.put("Name", "onAttendeesUnmuted")
+        jsonObject.put("Name", "OnAttendeesUnmuted")
         jsonObject.put("Arguments", eventArguments)
         _eventSink.success(jsonObject.toString())
     }

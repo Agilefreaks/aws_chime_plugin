@@ -6,19 +6,20 @@ import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.DefaultVideoRe
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.VideoRenderView
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.platform.PlatformView
 
-class AwsChimeRenderView internal constructor(context: Context?) : PlatformView,
-    MethodChannel.MethodCallHandler {
+class AwsChimeRenderView internal constructor(context: Context?) : PlatformView, MethodCallHandler {
 
     private val defaultVideoView: DefaultVideoRenderView = DefaultVideoRenderView(context!!)
 
-    val videoRenderView: VideoRenderView get() = defaultVideoView
+    val videoRenderView: VideoRenderView
+        get() = defaultVideoView
 
     override fun getView(): View = defaultVideoView
 
     override fun dispose() = Unit
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) =
-        result.notImplemented()
+            result.notImplemented()
 }

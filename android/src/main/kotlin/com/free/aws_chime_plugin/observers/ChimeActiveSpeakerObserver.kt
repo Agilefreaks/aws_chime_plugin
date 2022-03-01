@@ -6,12 +6,13 @@ import io.flutter.plugin.common.EventChannel
 import org.json.JSONArray
 import org.json.JSONObject
 
-class ChimeActiveSpeakerObserver(
-    private val _eventSink: EventChannel.EventSink
-) : ActiveSpeakerObserver {
-    /** Specifies period (in milliseconds) of updates for onActiveSpeakerScoreChange.
-     * If this is null, the observer will not get active speaker score updates.
-     *  Should be a value greater than 0. **/
+class ChimeActiveSpeakerObserver(private val _eventSink: EventChannel.EventSink) :
+        ActiveSpeakerObserver {
+    /**
+     * Specifies period (in milliseconds) of updates for onActiveSpeakerScoreChange. If this is
+     * null, the observer will not get active speaker score updates. Should be a value greater than
+     * 0.
+     */
     override val scoreCallbackIntervalMs: Int?
         get() = null
 
@@ -20,14 +21,12 @@ class ChimeActiveSpeakerObserver(
         jsonObject.put("Name", "OnActiveSpeakerDetected")
         jsonObject.put("Arguments", attendeeInfoToJson(attendeeInfo))
 
-        Handler(getMainLooper()).post {
-            _eventSink.success(jsonObject.toString())
-        }
+        Handler(getMainLooper()).post { _eventSink.success(jsonObject.toString()) }
     }
 
     override fun onActiveSpeakerScoreChanged(scores: Map<AttendeeInfo, Double>) {
         val jsonObject = JSONObject()
-        jsonObject.put("Name", "OnActiveSpeakerDetected")
+        jsonObject.put("Name", "OnActiveSpeakerScoreChanged")
         _eventSink.success(jsonObject.toString())
     }
 

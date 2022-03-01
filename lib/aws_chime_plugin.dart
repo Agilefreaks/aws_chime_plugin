@@ -9,7 +9,6 @@ class AwsChimePlugin {
       EventChannel('aws_chime_plugin_events');
 
   /// Subscribe to the event channel using:
-  /// AwsChimePlugin ???
   static EventChannel get eventChannel => _eventChannel;
 
   /// Get the AWS Chime SDK version
@@ -26,6 +25,7 @@ class AwsChimePlugin {
       required String mediaPlacementTurnControlUrl,
       required String meetingId,
       required String mediaRegion,
+      required String attendeeId,
       required String externalUserId,
       required String joinToken}) async {
     var params = {
@@ -36,11 +36,17 @@ class AwsChimePlugin {
       "MediaPlacementAudioFallbackUrl": mediaPlacementAudioFallbackUrl,
       "MediaPlacementSignalingUrl": mediaPlacementSignalingUrl,
       "MediaPlacementTurnControlUrl": mediaPlacementTurnControlUrl,
+      "AttendeeId": attendeeId,
       "ExternalUserId": externalUserId,
       "JoinToken": joinToken
     };
 
-    return _methodChannel.invokeMethod('CreateMeeting', params);
+    return _methodChannel.invokeMethod('CreateMeetingSession', params);
+  }
+
+  /// Clears all view ids of the ChimeDefaultVideoRenderViewFactory.
+  static Future<String?> clearViewIds() async {
+    return _methodChannel.invokeMethod('ClearViewIds');
   }
 
   /// Starts audio and video
@@ -51,6 +57,16 @@ class AwsChimePlugin {
   ///Stops audio and video
   static Future<String?> audioVideoStop() async {
     return _methodChannel.invokeMethod('AudioVideoStop');
+  }
+
+  /// Starts local video.
+  static Future<String?> audioVideoStartLocalVideo() async {
+    return _methodChannel.invokeMethod('AudioVideoStartLocalVideo');
+  }
+
+  /// Stops local video.
+  static Future<String?> audioVideoStopLocalVideo() async {
+    return _methodChannel.invokeMethod('AudioVideoStopLocalVideo');
   }
 
   /// Starts all remote video
@@ -73,5 +89,26 @@ class AwsChimePlugin {
   static Future<String?> unbindVideoView(int tileId) async {
     var params = {"TileId": tileId};
     return _methodChannel.invokeMethod('UnbindVideoView', params);
+  }
+
+  /// Mutes local audio.
+  static Future<String?> mute() async {
+    return _methodChannel.invokeMethod('Mute');
+  }
+
+  /// Unmutes local audio.
+  static Future<String?> unmute() async {
+    return _methodChannel.invokeMethod('Unmute');
+  }
+
+  /// Lists all available audio devices.
+  static Future<String?> listAudioDevices() async {
+    return _methodChannel.invokeMethod('ListAudioDevices');
+  }
+
+  /// Chooses a device by label.
+  static Future<String?> chooseAudioDevice(String label) async {
+    var params = {'Label': label};
+    return _methodChannel.invokeMethod('ChooseAudioDevice', params);
   }
 }
