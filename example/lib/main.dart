@@ -40,24 +40,22 @@ class _AwsChimeAppState extends State<AwsChimeApp> {
     var chimeViewChildren = List<Widget>.empty(growable: true);
 
     if (_attendees.length == 0) {
-      chimeViewChildren
-          .add(const Expanded(child: Center(child: Text('No attendees yet.'))));
+      chimeViewChildren.add(const Center(child: Text('No attendees yet.')));
     } else {
       for (int attendeeIndex = 0;
           attendeeIndex < _attendees.length;
           attendeeIndex++) {
         Attendee attendee = _attendees[attendeeIndex];
         if (attendee.videoView != null) {
-          chimeViewChildren.add(Expanded(
-              child: Center(
-                  child: AspectRatio(
-                      aspectRatio: attendee.aspectRatio,
-                      child: attendee.videoView))));
+          chimeViewChildren.add(Center(
+              child: AspectRatio(
+                  aspectRatio: 16.0 / 9.0, child: attendee.videoView)));
         }
       }
     }
 
-    var chimeViewColumn = Column(children: chimeViewChildren);
+    var chimeViewColumn =
+        GridView.count(crossAxisCount: 2, children: chimeViewChildren);
 
     Widget inputMeetingIdAndAttendeeName;
     final TextEditingController _meetingIdController = TextEditingController();
@@ -116,7 +114,8 @@ class _AwsChimeAppState extends State<AwsChimeApp> {
         home: Scaffold(
             appBar: AppBar(title: const Text('AwsChimePlugin')),
             resizeToAvoidBottomInset: false,
-            body: Column(children: [
+            body:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               const SizedBox(height: 8),
               Expanded(child: inputMeetingIdAndAttendeeName),
               Text(_createMeetingSessionResult),
