@@ -29,7 +29,7 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
     private var _eventSink: EventSink? = null
 
     override fun onAttachedToEngine(
-        @NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding
+            @NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding
     ) {
         val binaryMessenger = flutterPluginBinding.binaryMessenger
 
@@ -40,20 +40,20 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
 
         val eventChannel = EventChannel(binaryMessenger, "aws_chime_plugin_events")
         eventChannel.setStreamHandler(
-            object : EventChannel.StreamHandler {
-                override fun onListen(arguments: Any?, events: EventSink?) {
-                    _eventSink = events
-                }
+                object : EventChannel.StreamHandler {
+                    override fun onListen(arguments: Any?, events: EventSink?) {
+                        _eventSink = events
+                    }
 
-                override fun onCancel(arguments: Any?) {
-                    Log.d(TAG, "EventChannel.setStreamHandler().onCancel()")
+                    override fun onCancel(arguments: Any?) {
+                        Log.d(TAG, "EventChannel.setStreamHandler().onCancel()")
+                    }
                 }
-            }
         )
 
         flutterPluginBinding.platformViewRegistry.registerViewFactory(
-            "AwsChimeRenderView",
-            AwsChimeRenderViewFactory()
+                "AwsChimeRenderView",
+                AwsChimeRenderViewFactory()
         )
     }
 
@@ -71,7 +71,7 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
             "AudioVideoStopRemoteVideo" -> handleAudioVideoStopRemoteVideo(result)
             "BindVideoView" -> handleBindVideoView(call, result)
             "ChooseAudioDevice" -> handleChooseAudioDevice(call, result)
-            "ClearViewIds" -> handleClearViewIds(call, result)
+            "ClearViewIds" -> handleClearViewIds(result)
             "CreateMeetingSession" -> handleCreateMeetingSession(call, result)
             "GetVersion" -> result.success("Chime SDK")
             "ListAudioDevices" -> handleListAudioDevices(result)
@@ -82,7 +82,7 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun handleClearViewIds(call: MethodCall, result: Result) {
+    private fun handleClearViewIds(result: Result) {
         AwsChimeRenderViewFactory.clearViewIds()
         result.success(null)
     }
@@ -97,9 +97,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val attendeeId = call.argument<String>(ATTENDEE_ID)
         if (attendeeId == null) {
             result.error(
-                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
-                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + ATTENDEE_ID,
-                null
+                    UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                    UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + ATTENDEE_ID,
+                    null
             )
             return
         }
@@ -107,9 +107,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val externalMeetingId = call.argument<String>(EXTERNAL_MEETING_ID)
         if (externalMeetingId == null) {
             result.error(
-                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
-                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + EXTERNAL_MEETING_ID,
-                null
+                    UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                    UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + EXTERNAL_MEETING_ID,
+                    null
             )
             return
         }
@@ -117,9 +117,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val externalUserId = call.argument<String>(EXTERNAL_USER_ID)
         if (externalUserId == null) {
             result.error(
-                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
-                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + EXTERNAL_USER_ID,
-                null
+                    UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                    UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + EXTERNAL_USER_ID,
+                    null
             )
             return
         }
@@ -127,9 +127,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val joinToken = call.argument<String>(JoinToken)
         if (joinToken == null) {
             result.error(
-                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
-                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + JoinToken,
-                null
+                    UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                    UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + JoinToken,
+                    null
             )
             return
         }
@@ -137,9 +137,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val mediaRegion = call.argument<String>(MEDIA_REGION)
         if (mediaRegion == null) {
             result.error(
-                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
-                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + MEDIA_REGION,
-                null
+                    UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                    UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + MEDIA_REGION,
+                    null
             )
             return
         }
@@ -147,20 +147,20 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val meetingId = call.argument<String>(MEETING_ID)
         if (meetingId == null) {
             result.error(
-                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
-                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + MEETING_ID,
-                null
+                    UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                    UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + MEETING_ID,
+                    null
             )
             return
         }
 
         val mediaPlacementAudioFallbackUrl =
-            call.argument<String>(MEDIA_PLACEMENT_AUDIO_FALLBACK_URL)
+                call.argument<String>(MEDIA_PLACEMENT_AUDIO_FALLBACK_URL)
         if (mediaPlacementAudioFallbackUrl == null) {
             result.error(
-                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
-                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + MEDIA_PLACEMENT_AUDIO_FALLBACK_URL,
-                null
+                    UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                    UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + MEDIA_PLACEMENT_AUDIO_FALLBACK_URL,
+                    null
             )
             return
         }
@@ -168,9 +168,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val mediaPlacementAudioHostUrl = call.argument<String>(MEDIA_PLACEMENT_AUDIO_HOST_URL)
         if (mediaPlacementAudioHostUrl == null) {
             result.error(
-                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
-                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + MEDIA_PLACEMENT_AUDIO_HOST_URL,
-                null
+                    UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                    UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + MEDIA_PLACEMENT_AUDIO_HOST_URL,
+                    null
             )
             return
         }
@@ -178,9 +178,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val mediaPlacementSignalingUrl = call.argument<String>(MEDIA_PLACEMENT_SIGNALING_URL)
         if (mediaPlacementSignalingUrl == null) {
             result.error(
-                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
-                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + MEDIA_PLACEMENT_SIGNALING_URL,
-                null
+                    UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                    UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + MEDIA_PLACEMENT_SIGNALING_URL,
+                    null
             )
             return
         }
@@ -188,30 +188,30 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val mediaPlacementTurnControlUrl = call.argument<String>(MEDIA_PLACEMENT_TURN_CONTROL_URL)
         if (mediaPlacementTurnControlUrl == null) {
             result.error(
-                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
-                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + MEDIA_PLACEMENT_TURN_CONTROL_URL,
-                null
+                    UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                    UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + MEDIA_PLACEMENT_TURN_CONTROL_URL,
+                    null
             )
             return
         }
 
         val mediaPlacement =
-            MediaPlacement(
-                mediaPlacementAudioFallbackUrl,
-                mediaPlacementAudioHostUrl,
-                mediaPlacementSignalingUrl,
-                mediaPlacementTurnControlUrl,
-                ""
-            )
+                MediaPlacement(
+                        mediaPlacementAudioFallbackUrl,
+                        mediaPlacementAudioHostUrl,
+                        mediaPlacementSignalingUrl,
+                        mediaPlacementTurnControlUrl,
+                        ""
+                )
         val meeting = Meeting(externalMeetingId, mediaPlacement, mediaRegion, meetingId)
         val meetingResponse = CreateMeetingResponse(meeting)
         val attendee = Attendee(attendeeId, externalUserId, joinToken)
         val attendeeResponse = CreateAttendeeResponse(attendee)
         val configuration =
-            MeetingSessionConfiguration(meetingResponse, attendeeResponse) { s: String? -> s!! }
+                MeetingSessionConfiguration(meetingResponse, attendeeResponse) { s: String? -> s!! }
 
         val meetingSession: MeetingSession =
-            DefaultMeetingSession(configuration, ConsoleLogger(), safeApplicationContext)
+                DefaultMeetingSession(configuration, ConsoleLogger(), safeApplicationContext)
         val safeAudioVideoFacade: AudioVideoFacade = meetingSession.audioVideo
         _audioVideoFacade = safeAudioVideoFacade
 
@@ -222,8 +222,8 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         }
 
         safeAudioVideoFacade.addActiveSpeakerObserver(
-            DefaultActiveSpeakerPolicy(),
-            ChimeActiveSpeakerObserver(safeEventSink)
+                DefaultActiveSpeakerPolicy(),
+                ChimeActiveSpeakerObserver(safeEventSink)
         )
         safeAudioVideoFacade.addAudioVideoObserver(ChimeAudioVideoObserver(safeEventSink))
         safeAudioVideoFacade.addDeviceChangeObserver(ChimeDeviceChangeObserver(safeEventSink))
@@ -238,9 +238,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
         if (safeAudioVideoFacade == null) {
             result.error(
-                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
-                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
-                null
+                    NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                    NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                    null
             )
             return
         }
@@ -253,9 +253,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
         if (safeAudioVideoFacade == null) {
             result.error(
-                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
-                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
-                null
+                    NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                    NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                    null
             )
             return
         }
@@ -268,9 +268,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
         if (safeAudioVideoFacade == null) {
             result.error(
-                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
-                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
-                null
+                    NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                    NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                    null
             )
             return
         }
@@ -283,9 +283,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
         if (safeAudioVideoFacade == null) {
             result.error(
-                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
-                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
-                null
+                    NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                    NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                    null
             )
             return
         }
@@ -298,9 +298,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
         if (safeAudioVideoFacade == null) {
             result.error(
-                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
-                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
-                null
+                    NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                    NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                    null
             )
             return
         }
@@ -313,9 +313,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
         if (safeAudioVideoFacade == null) {
             result.error(
-                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
-                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
-                null
+                    NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                    NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                    null
             )
             return
         }
@@ -328,9 +328,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
         if (safeAudioVideoFacade == null) {
             result.error(
-                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
-                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
-                null
+                    NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                    NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                    null
             )
             return
         }
@@ -338,9 +338,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val viewId = call.argument<Int>(VIEW_ID)
         if (viewId == null) {
             result.error(
-                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
-                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + VIEW_ID,
-                null
+                    UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                    UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + VIEW_ID,
+                    null
             )
             return
         }
@@ -348,9 +348,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val tileId = call.argument<Int>(TILE_ID)
         if (tileId == null) {
             result.error(
-                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
-                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + TILE_ID,
-                null
+                    UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                    UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + TILE_ID,
+                    null
             )
             return
         }
@@ -371,9 +371,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
         if (safeAudioVideoFacade == null) {
             result.error(
-                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
-                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
-                null
+                    NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                    NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                    null
             )
             return
         }
@@ -381,9 +381,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val tileId = call.argument<Int>(TILE_ID)
         if (tileId == null) {
             result.error(
-                UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
-                UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + TILE_ID,
-                null
+                    UNEXPECTED_NULL_PARAMETER_ERROR_CODE,
+                    UNEXPECTED_NULL_PARAMETER_ERROR_MESSAGE + TILE_ID,
+                    null
             )
             return
         }
@@ -395,9 +395,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
         if (safeAudioVideoFacade == null) {
             result.error(
-                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
-                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
-                null
+                    NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                    NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                    null
             )
             return
         }
@@ -410,9 +410,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
         if (safeAudioVideoFacade == null) {
             result.error(
-                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
-                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
-                null
+                    NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                    NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                    null
             )
             return
         }
@@ -425,20 +425,20 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
         if (safeAudioVideoFacade == null) {
             result.error(
-                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
-                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
-                null
+                    NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                    NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                    null
             )
             return
         }
 
         var jsonString = ""
         for (device in safeAudioVideoFacade.listAudioDevices()) jsonString +=
-            "{\"Label\": \"" +
-                    device.label +
-                    "\", \"Type\": \"" +
-                    device.type +
-                    "\", \"Port\": \"no-port\", \"Description\": \"no-description\"},"
+                "{\"Label\": \"" +
+                        device.label +
+                        "\", \"Type\": \"" +
+                        device.type +
+                        "\", \"Port\": \"no-port\", \"Description\": \"no-description\"},"
 
         jsonString = jsonString.substring(0, jsonString.length - 1)
         @Suppress("ConvertToStringTemplate") jsonString = "[" + jsonString + "]"
@@ -449,9 +449,9 @@ class AwsChimePlugin : FlutterPlugin, MethodCallHandler {
         val safeAudioVideoFacade: AudioVideoFacade? = _audioVideoFacade
         if (safeAudioVideoFacade == null) {
             result.error(
-                NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
-                NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
-                null
+                    NO_AUDIO_VIDEO_FACADE_ERROR_CODE,
+                    NO_AUDIO_VIDEO_FACADE_ERROR_MESSAGE,
+                    null
             )
             return
         }
